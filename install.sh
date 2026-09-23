@@ -23,6 +23,16 @@ echo "=== Copying fancontrol configuration ==="
 cp "$SCRIPT_DIR/fancontrol.conf" /etc/fancontrol
 chmod 644 /etc/fancontrol
 
+echo "=== Installing boot-time hwmon path refresh ==="
+install -m 755 "$SCRIPT_DIR/update-hwmon-path.sh" /usr/local/sbin/update-fancontrol-hwmon
+mkdir -p /etc/systemd/system/fancontrol.service.d
+printf '%s\n' \
+    '[Service]' \
+    'ExecStartPre=/usr/local/sbin/update-fancontrol-hwmon' \
+    > /etc/systemd/system/fancontrol.service.d/hwmon-path.conf
+/usr/local/sbin/update-fancontrol-hwmon
+systemctl daemon-reload
+
 echo "=== Enabling and starting fancontrol service ==="
 systemctl unmask fancontrol || true
 systemctl enable fancontrol

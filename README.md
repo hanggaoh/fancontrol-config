@@ -33,6 +33,11 @@ Custom fan speed curve configuration for Ubuntu Linux on the **ASRock 970 Pro3 R
 
 - [`fancontrol.conf`](./fancontrol.conf) — The configuration file used by `/etc/fancontrol`.
 - [`install.sh`](./install.sh) — Quick-setup script to reinstall packages, configure modules, and apply settings.
+- [`update-hwmon-path.sh`](./update-hwmon-path.sh) — Refreshes the changing `hwmonN` index at service startup.
+
+The kernel can assign a different `hwmonN` index after a reboot. The installer adds
+a systemd startup step that finds the NCT6776 by name and updates `/etc/fancontrol`
+before `fancontrol` starts.
 
 ---
 
