@@ -1,0 +1,16 @@
+#!/bin/bash
+# systemd-sleep calls this before sleeping and after returning from sleep.
+set -euo pipefail
+
+# Respect administrators who have disabled automatic fan control.
+systemctl is-enabled --quiet fancontrol.service || exit 0
+case "${1:-}" in
+    pre)
+        # Let fancontrol restore its saved hardware settings before sleep.
+        systemctl stop fancontrol.service
+        ;;
+    post)
+        # Queue a fresh start without holding up the sleep transaction.
+        systemctl --no-block restart fancontrol.service
+        ;;
+esac

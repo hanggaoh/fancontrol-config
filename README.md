@@ -39,18 +39,23 @@ The kernel can assign a different `hwmonN` index after a reboot. The installer a
 a systemd startup step that finds the NCT6776 by name and updates `/etc/fancontrol`
 before `fancontrol` starts.
 
-The installer also installs `recovery.conf`, which restarts fancontrol five
-seconds after a failure. After suspend/resume, the controller can reject PWM
-writes until fancontrol reinitializes manual control. Each restart also reruns
-the hwmon index refresh. This keeps a resume-related write error from leaving
-the custom fan curve stopped indefinitely.
+The startup helper verifies the chip's physical path and required sensor files,
+then refreshes the index before the configuration check runs.
 
-To apply only this recovery setting to an existing installation:
+`fancontrol-sleep` stops the controller before suspend/hibernate and queues a
+fresh start after resume. It respects a disabled service. `recovery.conf` also
+restarts unexpected exits after five seconds, with no restart-rate cutoff if
+hardware is temporarily unavailable. An explicit service stop still stays stopped.
+
+Run `sudo ./install.sh` to install all startup and resume fixes. The installer
+backs up `/etc/fancontrol` before applying the repository's fan curve.
+Software does not run while suspended; control is reinitialized after waking.
+Hardware failures or invalid sensor mappings still require investigation.
+
+Read-only regression checks (using the connected NCT6776 for mapping checks):
 
 ```bash
-sudo install -m 644 recovery.conf /etc/systemd/system/fancontrol.service.d/recovery.conf
-sudo systemctl daemon-reload
-sudo systemctl restart fancontrol
+python3 -m unittest discover -s tests -v
 ```
 
 ---
