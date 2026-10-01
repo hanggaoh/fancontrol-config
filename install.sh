@@ -26,6 +26,7 @@ chmod 644 /etc/fancontrol
 echo "=== Installing boot-time hwmon path refresh ==="
 install -m 755 "$SCRIPT_DIR/update-hwmon-path.sh" /usr/local/sbin/update-fancontrol-hwmon
 mkdir -p /etc/systemd/system/fancontrol.service.d
+install -m 644 "$SCRIPT_DIR/recovery.conf" /etc/systemd/system/fancontrol.service.d/recovery.conf
 printf '%s\n' \
     '[Service]' \
     'ExecStartPre=/usr/local/sbin/update-fancontrol-hwmon' \

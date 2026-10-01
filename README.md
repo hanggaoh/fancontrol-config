@@ -39,6 +39,20 @@ The kernel can assign a different `hwmonN` index after a reboot. The installer a
 a systemd startup step that finds the NCT6776 by name and updates `/etc/fancontrol`
 before `fancontrol` starts.
 
+The installer also installs `recovery.conf`, which restarts fancontrol five
+seconds after a failure. After suspend/resume, the controller can reject PWM
+writes until fancontrol reinitializes manual control. Each restart also reruns
+the hwmon index refresh. This keeps a resume-related write error from leaving
+the custom fan curve stopped indefinitely.
+
+To apply only this recovery setting to an existing installation:
+
+```bash
+sudo install -m 644 recovery.conf /etc/systemd/system/fancontrol.service.d/recovery.conf
+sudo systemctl daemon-reload
+sudo systemctl restart fancontrol
+```
+
 ---
 
 ## Quick Commands
